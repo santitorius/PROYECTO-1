@@ -796,4 +796,9 @@ export const cierreFinal = {
   plan: 'Hablemos de un plan según el tamaño de tu negocio.',
   boton: 'Agenda tu demo por WhatsApp',
   contacto: marca.contacto,
+  /**
+   * Enlace real de WhatsApp (p. ej. 'https://wa.me/1809XXXXXXX?text=Quiero%20una%20demo').
+   * Mientras esté vacío, el botón no abre nada y muestra el pendiente de contacto.
+   */
+  enlace: '',
 };

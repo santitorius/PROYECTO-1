@@ -112,3 +112,26 @@
   font-style: normal;
   color: var(--qx-turquesa);
 }
+
+/* Versión 2D (sin WebGL): el cuerpo del teléfono con CSS */
+.screen.phone-2d {
+  overflow: visible;
+  box-shadow:
+    0 0 0 13px #0c1119,
+    0 0 0 14.5px #3a4654,
+    0 0 0 15.5px rgba(93, 203, 225, 0.35),
+    0 40px 90px rgba(0, 0, 0, 0.6);
+}
+.screen.phone-2d > .app,
+.screen.phone-2d > .stack {
+  border-radius: 47px;
+  overflow: clip;
+}
+.glass-off {
+  position: absolute;
+  inset: 0;
+  border-radius: 47px;
+  background: linear-gradient(145deg, #11161d 0%, #030406 45%, #020304 100%);
+  z-index: 40;
+  pointer-events: none;
+}

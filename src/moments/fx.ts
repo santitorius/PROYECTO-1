@@ -47,7 +47,7 @@ export class Floating {
     ctx.onTick((t) => {
       const on = parseFloat(el.style.opacity || '0') > 0.001;
       this.obj.visible = on;
-      if (!on || !this.drift) return;
+      if (!on || !this.drift || ctx.reducedMotion) return;
       // Deriva lenta: las timelines animan `home`, la deriva se suma encima.
       this.offset.set(Math.sin(t * 0.5 + this.seed) * this.drift, Math.cos(t * 0.37 + this.seed * 2) * this.drift, 0);
       this.obj.position.copy(this.home).add(this.offset);
@@ -136,6 +136,9 @@ export class LightBeam extends THREE.Mesh<THREE.TubeGeometry, THREE.ShaderMateri
   readonly p = { head: 0 };
   private curve = new THREE.QuadraticBezierCurve3(new THREE.Vector3(), new THREE.Vector3(0, 1, 2), new THREE.Vector3(1, 0, 0));
   private spark: THREE.Sprite;
+  get sparkObj(): THREE.Object3D {
+    return this.spark;
+  }
 
   constructor(scene: THREE.Scene) {
     const mat = new THREE.ShaderMaterial({
@@ -244,6 +247,8 @@ export class ClientDots extends THREE.Group {
   readonly carlosIndex: number;
   private axis: THREE.Mesh;
   private head: THREE.Mesh;
+  /** eje, marcas de semana y cabezal (para la versión 2D) */
+  readonly lines: THREE.Mesh[] = [];
   readonly weeks: number;
   readonly width = 12;
 
@@ -288,6 +293,7 @@ export class ClientDots extends THREE.Group {
       const tick = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.3, 0.03), this.axis.material);
       tick.position.x = -this.width / 2 + (i / weeks) * this.width;
       this.add(tick);
+      this.lines.push(tick);
     }
     this.head = new THREE.Mesh(
       new THREE.BoxGeometry(0.05, 4.6, 0.05),
@@ -295,6 +301,7 @@ export class ClientDots extends THREE.Group {
     );
     this.head.position.y = 2.2;
     this.add(this.head);
+    this.lines.push(this.axis, this.head);
     this.visible = false;
   }
 

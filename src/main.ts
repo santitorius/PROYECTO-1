@@ -20,8 +20,24 @@ import { createClienteApp } from './screens/cliente';
 import { createWhatsApp } from './screens/whatsapp';
 import { createStack } from './screens/stack';
 import { startPreview } from './preview';
+import { mirrorQ, mirrorFrame } from './core/fallback';
+import qFavicon from '../assets/logo/quovix-q.webp';
 
 applyTokens();
+
+// Ícono de la pestaña: la Q original.
+const icon = document.createElement('link');
+icon.rel = 'icon';
+icon.href = qFavicon;
+document.head.appendChild(icon);
+
+// Al presentar, el cursor se esconde si no se mueve (vuelve al mover el mouse).
+let cursorTimer = 0;
+window.addEventListener('mousemove', () => {
+  document.body.classList.remove('no-cursor');
+  clearTimeout(cursorTimer);
+  cursorTimer = window.setTimeout(() => document.body.classList.add('no-cursor'), 2500);
+});
 
 const $ = (id: string) => document.getElementById(id)!;
 const stageEl = $('stage');
@@ -30,20 +46,24 @@ const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 if (location.hash === '#pantallas') {
   startPreview(stageEl);
-} else if (!webglAvailable()) {
-  // [Etapa 4] versión 2D completa con los mismos momentos.
-  toast(stageEl, ui.sinWebGL);
 } else {
-  start();
+  // Sin WebGL: versión 2D con los mismos momentos (la escena se dibuja solo con DOM/CSS).
+  const gl = webglAvailable();
+  start(gl);
+  if (!gl && location.hash !== '#2d') toast(stageEl, ui.sinWebGL);
 }
 
-function start(): void {
-  const s = new Scene3D($('webgl'), $('css3d'), stage);
+function start(gl: boolean): void {
+  const s = new Scene3D($('webgl'), $('css3d'), stage, gl);
   s.reducedMotion = reduced.matches;
 
   const q = new QMark();
   const frame = new LightFrame();
   s.scene.add(q, frame);
+  if (!gl) {
+    mirrorQ(s, q);
+    mirrorFrame(s, frame);
+  }
 
   // Pantallas reales (DOM): la app del negocio y, en el teléfono del cliente, WhatsApp y la app Quovix.
   // Los botones reales disparan la consecuencia (el siguiente momento) cuando corresponde.

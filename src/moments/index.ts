@@ -34,6 +34,7 @@ import type { ClienteApp } from '../screens/cliente';
 import { createWhatsApp, type WhatsAppScreen, type WaMensaje } from '../screens/whatsapp';
 import { h, mount } from '../screens/dom';
 import { Floating, Flyer, LightBeam, ClientDots, ParticleMorph, fade } from './fx';
+import { mirrorSpark, mirrorDots } from '../core/fallback';
 
 export interface Apps {
   negocio: NegocioApp;
@@ -191,6 +192,7 @@ export function buildTimelines(ctx: Ctx): gsap.core.Timeline[] {
 
   /* ---------- objetos de escena ---------- */
   const beam = new LightBeam(s.scene);
+  if (!s.gl) mirrorSpark(s, beam.sparkObj);
 
   // Momento 2: burbujas sin responder, cuaderno y el cliente que se va.
   const burbujaPos = [
@@ -239,6 +241,7 @@ export function buildTimelines(ctx: Ctx): gsap.core.Timeline[] {
   const dots = new ClientDots(lineaTiempo.semanas);
   dots.position.set(0, -0.5, 0.4);
   s.scene.add(dots);
+  if (!s.gl) mirrorDots(s, dots.dots, dots.lines);
   const zoom = { v: 0 };
   s.onTick(() => {
     dots.update();
@@ -340,10 +343,21 @@ export function buildTimelines(ctx: Ctx): gsap.core.Timeline[] {
     { x: qFinal.x, y: qFinal.y, size: QMark.SIZE * qFinal.scale },
   );
   s.scene.add(particles);
-  s.onTick(() => particles.update(s.renderer.getPixelRatio()));
+  s.onTick(() => particles.update(s.pixelRatio));
   // Cierre: bloque final (DOM en la capa de frases).
   const finalNum = h('b', null, '0');
-  const cta = h('button', { class: 'cta interactive', type: 'button' }, cierreFinal.boton, h('small', null, cierreFinal.contacto));
+  const cta = h(
+    'button',
+    {
+      class: 'cta interactive',
+      type: 'button',
+      onclick: () => {
+        if (cierreFinal.enlace) window.open(cierreFinal.enlace, '_blank', 'noopener');
+      },
+    },
+    cierreFinal.boton,
+    cierreFinal.enlace ? null : h('small', null, cierreFinal.contacto),
+  );
   const finalEl = h(
     'div',
     { class: 'final' },
@@ -399,7 +413,7 @@ export function buildTimelines(ctx: Ctx): gsap.core.Timeline[] {
     // el cliente aparece… y se desvanece sin que nadie lo note
     fade(tl, seVa.el, 1, 3.6, 0.8);
     tl.to(seVa.obj.position, { x: 12.6, z: -5, duration: 2.4, ease: 'power1.in' }, 4.6);
-    tl.to(seVa.el, { opacity: 0, filter: 'blur(6px)', duration: 2.0, ease: 'power1.in' }, 5.0);
+    tl.to(seVa.el, { opacity: 0, duration: 2.0, ease: 'power1.in' }, 5.0);
     const esl = caption(ctx, marca.eslogan, 'left');
     hide(tl, c, 6.6);
     show(tl, esl, 7.2);

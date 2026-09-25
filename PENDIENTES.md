@@ -26,8 +26,5 @@ Todo lo que falta confirmar o entregar. En pantalla, cada uno se ve como `[PENDI
 - [ ] Se quitaron de las pantallas, por las reglas de la demo: "Paga en línea", "Métodos de pago / tarjetas guardadas", "2x puntos pagando en línea", "Comisión de la plataforma", "En línea" como método de cobro y "Cobros y banco".
 
 ## Escena (etapa 3)
-- [ ] Botón final «Agenda tu demo por WhatsApp»: muestra `[PENDIENTE: contacto real]` y no abre nada hasta tener el número.
+- [ ] Botón final «Agenda tu demo por WhatsApp»: muestra `[PENDIENTE: contacto real]` y no abre nada hasta tener el número. Cuando exista, ponlo en `cierreFinal.enlace` (`src/content.es.ts`).
 - [ ] Textos nuevos para revisar: chats sin responder del momento 2, cuaderno de citas, mensaje a Carlos y su respuesta («Dale, el lunes a las 4 me sirve 👍»), guion del bot de soporte. Todos en `src/content.es.ts`.
-
-## Técnicos (se resuelven en las etapas siguientes)
-- [ ] Etapa 4: versión 2D de respaldo sin WebGL (hoy solo avisa), pulido y README completo.

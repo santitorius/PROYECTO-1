@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "build:single": "tsc --noEmit && vite build --mode single",
+    "build:single": "tsc --noEmit && vite build --mode single && node scripts/entrega.mjs",
+    "build:all": "npm run build && npm run build:single",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },

@@ -318,3 +318,23 @@
 .qx-float.card {
   color: var(--ink);
 }
+
+/* Versión 2D (sin WebGL) */
+.m2d-q {
+  width: 700px;
+  height: 700px;
+}
+.m2d-frame {
+  border-style: solid;
+  border-color: #bfeef6 var(--qx-turquesa) var(--qx-turquesa) #fff;
+  box-sizing: border-box;
+}
+/* Sin filter ni mix-blend-mode: dentro de la escena CSS 3D aplanarían todo. */
+.m2d-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+.m2d-line {
+  background: var(--qx-turquesa);
+}

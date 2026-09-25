@@ -92,6 +92,8 @@ export class Phone extends THREE.Group {
   private readonly anchor = new THREE.Object3D();
   private _opacity = 1;
   private _screenOn = 1;
+  /** versión 2D: cristal negro encima de la pantalla cuando el teléfono está apagado */
+  private glassOff: HTMLDivElement | null = null;
 
   constructor(
     readonly name: string,
@@ -141,6 +143,13 @@ export class Phone extends THREE.Group {
     this.screenEl.className = 'screen';
     this.screenEl.dataset.phone = name;
     this.screenEl.appendChild(content);
+    if (!ctx.gl) {
+      // Sin WebGL el cuerpo del teléfono se dibuja con CSS alrededor de la pantalla.
+      this.screenEl.classList.add('phone-2d');
+      this.glassOff = document.createElement('div');
+      this.glassOff.className = 'glass-off';
+      this.screenEl.appendChild(this.glassOff);
+    }
     this.css = new CSS3DObject(this.screenEl);
     ctx.cssScene.add(this.css);
 
@@ -162,7 +171,7 @@ export class Phone extends THREE.Group {
       normal.set(0, 0, 1).applyQuaternion(q);
       toCam.copy(ctx.camera.position).sub(p);
       const facing = normal.dot(toCam) > 0;
-      const on = facing && this.visible && this._opacity > 0.001 && this._screenOn > 0.001;
+      const on = facing && this.visible && this._opacity > 0.001 && (this._screenOn > 0.001 || !!this.glassOff);
       // visibility (no display:none) para que la pantalla siga midiendo y guardando su scroll.
       const v = on ? '' : 'hidden';
       if (this.screenEl.style.visibility !== v) this.screenEl.style.visibility = v;
@@ -211,6 +220,10 @@ export class Phone extends THREE.Group {
     this.bodyMat.depthWrite = o > 0.99;
     this.glassMat.depthWrite = o > 0.99;
     this.visible = o > 0.001;
-    this.screenEl.style.opacity = String(o * this._screenOn);
+    if (this.glassOff) {
+      this.screenEl.style.opacity = String(o);
+      this.glassOff.style.opacity = String(1 - this._screenOn);
+      this.glassOff.style.pointerEvents = this._screenOn > 0.5 ? 'none' : 'auto';
+    } else this.screenEl.style.opacity = String(o * this._screenOn);
   }
 }

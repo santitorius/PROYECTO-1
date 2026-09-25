@@ -324,3 +324,8 @@ body {
   padding: 8px 16px;
   cursor: pointer;
 }
+
+body.no-cursor,
+body.no-cursor * {
+  cursor: none !important;
+}
