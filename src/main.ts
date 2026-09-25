@@ -2,6 +2,7 @@ import './styles/fonts.css';
 import './styles/base.css';
 import './styles/screens.css';
 import './styles/app.css';
+import './styles/scene.css';
 import { gsap } from 'gsap';
 import { applyTokens } from './tokens';
 import { ui } from './content.es';
@@ -10,7 +11,7 @@ import { Scene3D, webglAvailable } from './core/scene';
 import { Phone } from './core/phone';
 import { QMark, LightFrame } from './core/qmark';
 import { MomentController } from './core/moments';
-import { buildTimelines, initialState, type Ctx } from './moments';
+import { buildTimelines, initialState, demo, type Ctx } from './moments';
 import { Hud, hudState } from './ui/hud';
 import { Presenter } from './ui/presenter';
 import { GotoOverlay, Overview, toast } from './ui/overlays';
@@ -45,7 +46,23 @@ function start(): void {
   s.scene.add(q, frame);
 
   // Pantallas reales (DOM): la app del negocio y, en el teléfono del cliente, WhatsApp y la app Quovix.
-  const appNegocio = createNegocioApp();
+  // Los botones reales disparan la consecuencia (el siguiente momento) cuando corresponde.
+  let moments!: MomentController;
+  const enPausa = (n: number) => moments && moments.current === n && !moments.state().animating;
+  const appNegocio = createNegocioApp({
+    escribir: (cita) => {
+      if (cita === null && enPausa(3)) return moments.next(), true;
+    },
+    enviarCarlos: () => {
+      if (enPausa(6)) return moments.next(), true;
+    },
+    cobrar: (cita, metodo) => {
+      if (cita.id === 'a6' && enPausa(7)) {
+        demo.metodo = metodo;
+        return moments.next(), true;
+      }
+    },
+  });
   const appCliente = createClienteApp();
   const wa = createWhatsApp();
   const pantallaCliente = createStack({ whatsapp: wa.el, quovix: appCliente.el }, 'quovix');
@@ -77,7 +94,7 @@ function start(): void {
     }
   });
 
-  const moments = new MomentController(buildTimelines(ctx));
+  moments = new MomentController(buildTimelines(ctx));
   const applySpeed = () => {
     s.reducedMotion = reduced.matches;
     // Movimiento reducido: mismas escenas, transiciones más cortas y sin flotación.

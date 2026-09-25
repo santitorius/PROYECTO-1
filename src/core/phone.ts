@@ -6,7 +6,7 @@ import type { Scene3D } from './scene';
 /** Medidas del teléfono en unidades de mundo. La pantalla DOM mide 390x844 px. */
 export const PHONE = {
   w: 4.3,
-  h: 8.9,
+  h: 9.0,
   d: 0.34,
   radius: 0.62,
   bezel: 0.13,
@@ -32,6 +32,33 @@ function roundedRectShape(w: number, h: number, r: number): THREE.Shape {
   s.absarc(x + r, y + r, r, Math.PI, Math.PI * 1.5, false);
   return s;
 }
+
+/** Posición (px) del centro de un elemento dentro de la pantalla, descontando scroll. */
+export function localPos(el: HTMLElement, root: HTMLElement): { x: number; y: number } {
+  if (!root.contains(el) || !el.offsetParent) return { x: PHONE.screenPx.w / 2, y: PHONE.screenPx.h / 2 };
+  let x = el.offsetWidth / 2;
+  let y = el.offsetHeight / 2;
+  let n: HTMLElement | null = el;
+  while (n && n !== root) {
+    x += n.offsetLeft;
+    y += n.offsetTop;
+    const p = n.offsetParent as HTMLElement | null;
+    for (let a: HTMLElement | null = n.parentElement; a && a !== p; a = a.parentElement) {
+      x -= a.scrollLeft;
+      y -= a.scrollTop;
+    }
+    if (!p) break;
+    if (p !== root) {
+      x -= p.scrollLeft;
+      y -= p.scrollTop;
+    }
+    n = p;
+  }
+  return { x, y };
+}
+
+/** Unidades de mundo por px de pantalla (para objetos DOM flotantes del mismo tamaño). */
+export const PX_WORLD = PX;
 
 let glassTex: THREE.Texture | null = null;
 function glassTexture(): THREE.Texture {
@@ -135,10 +162,26 @@ export class Phone extends THREE.Group {
       normal.set(0, 0, 1).applyQuaternion(q);
       toCam.copy(ctx.camera.position).sub(p);
       const facing = normal.dot(toCam) > 0;
-      this.css.visible = facing && this.visible && this._opacity > 0.001 && this._screenOn > 0.001;
+      const on = facing && this.visible && this._opacity > 0.001 && this._screenOn > 0.001;
+      // visibility (no display:none) para que la pantalla siga midiendo y guardando su scroll.
+      const v = on ? '' : 'hidden';
+      if (this.screenEl.style.visibility !== v) this.screenEl.style.visibility = v;
     });
 
     this.applyOpacity();
+  }
+
+  /** Punto de la pantalla (px de 390x844) en coordenadas de mundo. */
+  screenToWorld(px: number, py: number, lift = 0.02): THREE.Vector3 {
+    this.updateWorldMatrix(true, false);
+    return this.localToWorld(new THREE.Vector3((px - PHONE.screenPx.w / 2) * PX, (PHONE.screenPx.h / 2 - py) * PX, PHONE.d / 2 + lift));
+  }
+
+  /** Centro de un elemento de la pantalla en coordenadas de mundo (sirve aunque haya scroll). */
+  elWorld(el: Element | null, lift = 0.02): THREE.Vector3 {
+    if (!el) return this.screenToWorld(PHONE.screenPx.w / 2, PHONE.screenPx.h / 2, lift);
+    const { x, y } = localPos(el as HTMLElement, this.screenEl);
+    return this.screenToWorld(x, y, lift);
   }
 
   /** Opacidad global del teléfono (cuerpo + pantalla). */

@@ -25,6 +25,9 @@ Todo lo que falta confirmar o entregar. En pantalla, cada uno se ve como `[PENDI
 - [ ] Negocios de ejemplo en la app del cliente (Studio Aura, Nails Bar, Casa Spa Zen) con zonas inventadas (Naco, Bella Vista, Gazcue).
 - [ ] Se quitaron de las pantallas, por las reglas de la demo: "Paga en línea", "Métodos de pago / tarjetas guardadas", "2x puntos pagando en línea", "Comisión de la plataforma", "En línea" como método de cobro y "Cobros y banco".
 
+## Escena (etapa 3)
+- [ ] Botón final «Agenda tu demo por WhatsApp»: muestra `[PENDIENTE: contacto real]` y no abre nada hasta tener el número.
+- [ ] Textos nuevos para revisar: chats sin responder del momento 2, cuaderno de citas, mensaje a Carlos y su respuesta («Dale, el lunes a las 4 me sirve 👍»), guion del bot de soporte. Todos en `src/content.es.ts`.
+
 ## Técnicos (se resuelven en las etapas siguientes)
-- [ ] Etapa 3: contenido y consecuencia de los momentos 2 a 13 (hoy tienen solo cámara, teléfonos y frases).
 - [ ] Etapa 4: versión 2D de respaldo sin WebGL (hoy solo avisa), pulido y README completo.

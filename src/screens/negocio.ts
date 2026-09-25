@@ -19,6 +19,8 @@ import {
   reporteMes,
   reporteSemanal,
   serviciosVendidos,
+  avisoWhatsApp,
+  soporteGuion,
   type Cita,
   type Dia,
   type Metodo,
@@ -38,10 +40,11 @@ export interface Mensaje {
 }
 
 /** Eventos que la presentación escucha (etapa 3: consecuencias). */
+/** Si un evento devuelve `true`, la presentación se encarga (la app no aplica el cambio por su cuenta). */
 export interface NegocioEventos {
-  cobrar?: (cita: Cita, metodo: Metodo, boton: HTMLElement) => void;
-  escribir?: (cita: Cita, boton: HTMLElement) => void;
-  enviarCarlos?: (boton: HTMLElement) => void;
+  cobrar?: (cita: Cita, metodo: Metodo, boton: HTMLElement) => boolean | void;
+  escribir?: (cita: Cita | null, boton: HTMLElement) => boolean | void;
+  enviarCarlos?: (boton: HTMLElement) => boolean | void;
   asistente?: (accion: 'abrir' | 'lanzar' | 'descartar') => void;
   tab?: (tab: Tab) => void;
 }
@@ -72,6 +75,9 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
     typing: null as null | 'cliente' | 'agente',
     burbuja: true,
     burbujaTexto: false,
+    aviso: false,
+    anim: '' as '' | 'ventas' | 'finanzas',
+    countFrom: 0,
   };
 
   const root = h('div', { class: 'app negocio' });
@@ -100,6 +106,8 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
 
   function render(): void {
     const top = body.scrollTop;
+    body.classList.toggle('anim-ventas', st.anim === 'ventas');
+    body.classList.toggle('anim-finanzas', st.anim === 'finanzas');
     renderTabbar();
     if (st.tab === 'agenda') renderAgenda();
     else if (st.tab === 'ventas') renderVentas();
@@ -108,6 +116,7 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
     else renderNegocio();
     renderBubble();
     body.scrollTop = top;
+    st.anim = '';
   }
 
   function go(tab: Tab): void {
@@ -190,6 +199,7 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
       d.cerrado
         ? h('div', { class: 'card closed-card' }, h('b', null, T.agenda.cerrado), h('span', { class: 'muted' }, T.agenda.cerradoDetalle))
         : [
+            esHoy && st.aviso ? avisoCard() : null,
             next ? nextCard(next) : null,
             h(
               'div',
@@ -230,6 +240,36 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
               ? visibles.map((c) => apptCard(c))
               : h('div', { class: 'empty' }, st.filtro === 'Pendientes' ? T.agenda.sinPendientes : T.agenda.todoCobrado),
           ],
+    );
+  }
+
+  function avisoCard(): HTMLElement {
+    const A = avisoWhatsApp;
+    return h(
+      'div',
+      { class: 'card aviso', 'data-aviso': '' },
+      h('div', { class: 'eyebrow wa-eyebrow' }, A.etiqueta),
+      h('div', { class: 'row' }, avatar(A.nombre, 'sm'), h('div', { class: 'grow' }, h('b', null, A.nombre), h('div', { class: 'aviso-txt' }, A.texto))),
+      h(
+        'div',
+        { class: 'act' },
+        h(
+          'button',
+          {
+            class: 'btn pri sm',
+            'data-escribir-aviso': '',
+            onclick: (e: Event) => {
+              if (ev.escribir?.(null, e.currentTarget as HTMLElement) !== true) {
+                st.aviso = false;
+                render();
+                openChat(A.nombre);
+              }
+            },
+          },
+          A.escribir,
+        ),
+        h('button', { class: 'btn soft sm', onclick: () => ((st.aviso = false), render()) }, A.despues),
+      ),
     );
   }
 
@@ -343,8 +383,7 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
               'data-metodo': m.id,
               onclick: () => {
                 closeSheet();
-                cobrar(c.id, m.id);
-                ev.cobrar?.(c, m.id, boton);
+                if (ev.cobrar?.(c, m.id, boton) !== true) cobrar(c.id, m.id);
               },
             },
             m.nombre,
@@ -382,8 +421,7 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
   }
 
   function escribir(c: Cita, boton: HTMLElement): void {
-    if (ev.escribir) ev.escribir(c, boton);
-    else openChat(c.cliente);
+    if (ev.escribir?.(c, boton) !== true) openChat(c.cliente);
   }
 
   /* ---------------- VENTAS ---------------- */
@@ -432,7 +470,7 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
         'div',
         { class: 'card grad', 'data-total-hoy': '' },
         h('div', { class: 'eyebrow' }, T.ventas.cobradoHoy),
-        h('div', { class: 'big-total num' }, RD(total)),
+        countUp(h('div', { class: 'big-total num' }, RD(total)), st.anim === 'ventas' ? st.countFrom : total, total),
         h('div', { style: 'font-size:13px' }, T.ventas.serviciosCobrados(cobradas.length, RD(esperadoHoy()))),
       ),
       metodoCards(vals, total),
@@ -484,11 +522,21 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
       h(
         'div',
         { class: 'card grad lines', 'data-resultado': '' },
-        h('div', { class: 'eyebrow', style: 'margin-bottom:6px' }, T.ventas.resultado),
+        h(
+          'div',
+          { class: 'res-head' },
+          h('div', { class: 'eyebrow' }, T.ventas.resultado),
+          h('button', { class: 'pdf-mini', 'data-pdf': '', onclick: () => screenToast(root, T.ventas.pdfListo), html: icon.download + '<span>PDF</span>' }),
+        ),
         h('div', { class: 'l', 'data-l': 'ingresos' }, h('span', null, T.ventas.ingresos), h('b', { class: 'num' }, RD(R.ingresos))),
         h('div', { class: 'l', 'data-l': 'insumos' }, h('span', null, T.ventas.insumos), h('b', { class: 'num' }, '- ' + RD(R.insumos))),
         h('div', { class: 'l', 'data-l': 'equipo' }, h('span', null, T.ventas.pagoEquipo), h('b', { class: 'num' }, '- ' + RD(R.pagoEquipo))),
-        h('div', { class: 'net', 'data-l': 'neto' }, h('span', { style: 'font-weight:900' }, T.ventas.neto), h('b', { class: 'num' }, RD(R.neto))),
+        h(
+          'div',
+          { class: 'net', 'data-l': 'neto' },
+          h('span', { style: 'font-weight:900' }, T.ventas.neto),
+          countUp(h('b', { class: 'num' }, RD(R.neto)), st.anim === 'finanzas' ? 0 : R.neto, R.neto, 1400),
+        ),
       ),
       h('div', { class: 'sec' }, T.ventas.porMetodo, h('small', null, RD(R.ingresos))),
       metodoCards(R.porMetodo, R.ingresos),
@@ -695,8 +743,7 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
           'data-enviar-carlos': '',
           onclick: (e: Event) => {
             if (st.carlos !== 'listo') return;
-            setCarlos('enviado');
-            ev.enviarCarlos?.(e.currentTarget as HTMLElement);
+            if (ev.enviarCarlos?.(e.currentTarget as HTMLElement) !== true) setCarlos('enviado');
           },
         },
         btnLabel,
@@ -1015,6 +1062,48 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
       body.scrollTop = 0;
       render();
     },
+    /** Estado completo de la demo (declarativo: sirve para ir y volver entre momentos). */
+    setDemo(d: DemoNegocio = {}) {
+      st.dias = clone(agendaBase);
+      st.nuevas.clear();
+      st.pagados.clear();
+      for (const [diaId, cita] of d.extra ?? []) st.dias.find((x) => x.id === diaId)!.citas.push(clone(cita));
+      for (const id of d.nuevas ?? []) st.nuevas.add(id);
+      for (const [id, m] of d.cobradas ?? []) {
+        const c = todas().find((x) => x.id === id);
+        if (c) Object.assign(c, { estado: 'cobrada', metodo: m });
+      }
+      Object.assign(st, {
+        tab: d.tab ?? 'agenda',
+        dia: d.dia ?? agendaBase[0].id,
+        filtro: 'Todas',
+        ventas: d.ventas ?? 'hoy',
+        periodo: d.periodo ?? 'semana',
+        insumosAbiertos: d.insumos ?? false,
+        filtroCli: d.filtroCli ?? 'Todos',
+        carlos: d.carlos ?? 'listo',
+        burbuja: d.burbuja?.[0] ?? true,
+        burbujaTexto: d.burbuja?.[1] ?? false,
+        aviso: d.aviso ?? false,
+        anim: d.anim ?? '',
+        countFrom: d.countFrom ?? 0,
+        typing: d.chat?.typing ?? null,
+      });
+      if (d.chat) {
+        st.chatMsgs.set(d.chat.nombre, d.chat.msgs);
+        st.chat = d.chat.nombre;
+        renderConv();
+        conv.classList.add('open');
+      } else closeChat();
+      closeSheet();
+      body.scrollTop = 0;
+      render();
+      if (d.scroll) {
+        const el = typeof d.scroll === 'string' ? root.querySelector<HTMLElement>(d.scroll) : null;
+        body.scrollTop = el ? el.offsetTop - 12 : Number(d.scroll) || 0;
+      }
+    },
+    body,
     q: <E extends HTMLElement = HTMLElement>(sel: string) => root.querySelector<E>(sel),
     scrollTo(sel: string, offset = 12) {
       const el = root.querySelector<HTMLElement>(sel);
@@ -1027,6 +1116,66 @@ export function createNegocioApp(ev: NegocioEventos = {}) {
 }
 
 export type NegocioApp = ReturnType<typeof createNegocioApp>;
+
+export interface DemoNegocio {
+  tab?: Tab;
+  dia?: string;
+  ventas?: 'hoy' | 'finanzas';
+  periodo?: 'semana' | 'mes';
+  insumos?: boolean;
+  filtroCli?: FiltroCli;
+  carlos?: EstadoCarlos;
+  extra?: [string, Cita][];
+  nuevas?: string[];
+  cobradas?: [string, Metodo][];
+  chat?: { nombre: string; msgs: Mensaje[]; typing?: null | 'cliente' | 'agente' } | null;
+  burbuja?: [boolean, boolean];
+  aviso?: boolean;
+  scroll?: string | number;
+  anim?: '' | 'ventas' | 'finanzas';
+  countFrom?: number;
+}
+
+/** Cuenta un número de `from` a `to` (RD$) al aparecer el elemento. */
+function countUp<E extends HTMLElement>(el: E, from: number, to: number, ms = 1100): E {
+  if (from === to) return el;
+  const t0 = performance.now();
+  const tick = (now: number) => {
+    const k = Math.min(1, (now - t0) / ms);
+    const e = 1 - Math.pow(1 - k, 3);
+    el.textContent = RD(Math.round((from + (to - from) * e) / 10) * 10);
+    if (k < 1 && el.isConnected) requestAnimationFrame(tick);
+    else el.textContent = RD(to);
+  };
+  el.textContent = RD(from);
+  requestAnimationFrame(tick);
+  return el;
+}
+
+/**
+ * Tarjeta del bot de soporte (momento 11), fuera del teléfono. `paso` va de 0 a 4.
+ * Mismo guion que la pestaña Negocio → Soporte.
+ */
+export function soporteCard(paso: number): HTMLElement {
+  const S = T.soporte;
+  const G = soporteGuion;
+  const m = (t: string | Node, me = false, i = 0) => (i <= paso ? h('div', { class: `m ${me ? 'me' : ''}` }, t) : null);
+  return h(
+    'div',
+    { class: 'card soporte-card' },
+    h('div', { class: 'ai-head' }, h('div', { class: 'ball', html: icon.support, style: 'color:#5dcbe1' }), h('div', null, h('h3', null, S.titulo), h('small', { class: 'muted' }, G.sub))),
+    h(
+      'div',
+      { class: 'bot' },
+      m(S.saludo, false, 0),
+      m(S.opciones[0], true, 1),
+      m(S.sugerencia, false, 2),
+      m(S.resuelto, false, 2),
+      m(S.ticket, true, 3),
+      paso >= 4 ? h('div', { class: 'ticket' }, S.ticketCreado(S.numeroTicket)) : null,
+    ),
+  );
+}
 
 function mins(hora: string): number {
   const m = hora.match(/(\d+):(\d+)\s*([ap])/i);

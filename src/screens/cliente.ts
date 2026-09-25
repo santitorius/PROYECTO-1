@@ -469,6 +469,29 @@ export function createClienteApp(ev: ClienteEventos = {}) {
       Object.assign(st, { reservas: [], paso: 'bienvenida', tab: 'explorar', vista: null, citasTab: 'proximas', tieneProxima: true, cat: 0, svc: 0, hora: 1, codigo: 0, nombreTecleado: 0 });
       render();
     },
+    /** Estado completo (declarativo). `animar` reproduce el código y el nombre escribiéndose. */
+    setDemo(d: { paso?: Paso; tab?: Tab; vista?: Vista; citasTab?: 'proximas' | 'historial'; proxima?: boolean; scroll?: number; animar?: boolean } = {}) {
+      clearTimers();
+      Object.assign(st, {
+        tab: d.tab ?? 'explorar',
+        vista: d.vista ?? null,
+        citasTab: d.citasTab ?? 'proximas',
+        tieneProxima: d.proxima ?? true,
+        reservas: [],
+        cat: 0,
+        svc: 0,
+        hora: 1,
+      });
+      setPaso(d.paso ?? 'app', d.animar ?? false);
+      if (d.scroll) {
+        const b = root.querySelector<HTMLElement>('.body');
+        if (b) b.scrollTop = d.scroll;
+      }
+    },
+    scrollBody(y: number) {
+      const b = root.querySelector<HTMLElement>('.body');
+      if (b) b.scrollTo({ top: y, behavior: 'smooth' });
+    },
     q: <E extends HTMLElement = HTMLElement>(sel: string) => root.querySelector<E>(sel),
     get state() {
       return st;

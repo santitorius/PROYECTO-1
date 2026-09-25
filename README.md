@@ -3,7 +3,7 @@
 Presentación controlada por el presentador, en una sola escena 3D continua (three.js + GSAP),
 con las pantallas de los teléfonos hechas en HTML/CSS real.
 
-> Estado: **Etapa 2** (pantallas interactivas del negocio y del cliente en DOM real).
+> Estado: **Etapa 3** (los 13 momentos con sus consecuencias, adelante y atrás).
 > El README completo llega en la Etapa 4.
 
 ## Correr
@@ -29,6 +29,13 @@ npm run build:single   # dist-single/index.html: un solo archivo, abre con doble
 | Inicio / Fin | Negro inicial / cierre |
 
 Los clics dentro de las pantallas de los teléfonos son interacción y no avanzan la presentación.
+Tres botones reales sí disparan la consecuencia (el momento siguiente), igual que la flecha:
+
+| Pausa en | Botón en la pantalla | Consecuencia |
+|---|---|---|
+| 3 · Agenda | «Escribir» del aviso de WhatsApp de Luis | El chat sale del teléfono y se vuelve el teléfono del cliente |
+| 6 · Cliente en riesgo | «Enviar mensaje por WhatsApp» | El mensaje viaja a Carlos, responde y su cita vuelve a la agenda |
+| 7 · Cobrar | «Cobrar RD$600» y el método (efectivo, tarjeta o transferencia) | El monto vuela a Ventas con el método elegido |
 
 ## Revisar las pantallas sin 3D
 

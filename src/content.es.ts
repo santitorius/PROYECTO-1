@@ -140,7 +140,7 @@ export const momentos: Momento[] = [
   {
     n: 12,
     titulo: 'Próximamente',
-    frases: ['Próximamente: pago en línea'],
+    frases: [],
     minutos: 0,
     notas: 'Solo se menciona. No está disponible todavía. No prometas fecha.',
   },
@@ -729,4 +729,71 @@ export const whatsapp = {
   escribiendo: 'escribiendo…',
   hoy: 'Hoy',
   escribe: 'Mensaje',
+};
+
+/* =====================================================================
+ * ESCENA · textos de los momentos (etapa 3)
+ * ===================================================================== */
+
+/** Momento 2: chats sin responder que flotan alrededor del teléfono apagado. */
+export const burbujasSinResponder = [
+  { nombre: 'Kelvin', texto: '¿Tienen turno hoy?', hace: 'hace 2 h' },
+  { nombre: 'Luis', texto: 'Klk, ¿abren mañana?', hace: 'hace 3 h' },
+  { nombre: 'Ramón', texto: '¿Cuánto es el corte + barba?', hace: 'hace 45 min' },
+  { nombre: 'Pedro', texto: '¿Me pueden atender a las 5?', hace: 'hace 1 h' },
+  { nombre: 'José', texto: 'Hola?? 😕', hace: 'hace 4 h' },
+  { nombre: 'Samuel', texto: 'Bueno, voy a otro lado.', hace: 'hace 5 h' },
+];
+export const sinResponder = 'Sin responder';
+
+/** Momento 2: el cuaderno de citas. */
+export const cuaderno = {
+  titulo: 'Citas · viernes',
+  lineas: [
+    { t: '9:00 Junior — corte + barba', tachada: false },
+    { t: '10:00 Pedro ¿o era 10:30?', tachada: false },
+    { t: '11:00 Miguel', tachada: true },
+    { t: '12:30 ¿? (llamó, no anoté)', tachada: false },
+    { t: '2:00 Ramón — tinte', tachada: false },
+    { t: '3:30 Wilson ✓', tachada: false },
+    { t: '5:30 José ?? confirmar', tachada: false },
+  ],
+};
+
+/** Momento 2: el cliente que se desvanece. */
+export const clienteQueSeVa = { nombre: 'Carlos', nota: 'No volvió. Nadie se dio cuenta.' };
+
+/** Momento 3 → 4: aviso de WhatsApp dentro de la agenda. */
+export const avisoWhatsApp = {
+  etiqueta: 'WhatsApp · ahora',
+  nombre: 'Luis Duarte',
+  texto: conversacionAgente[0].texto,
+  escribir: 'Escribir',
+  despues: 'Ahora no',
+};
+
+/** Momento 5: la línea del tiempo. */
+export const lineaTiempo = {
+  semana: (n: number) => `Sem. ${n}`,
+  titulo: 'Semanas',
+  carlos: 'Carlos Peña',
+  carlosActivo: 'Corte cada 3 semanas',
+  carlosPerdido: '7 semanas sin venir',
+  semanas: 8,
+};
+
+/** Momento 11: el bot de soporte fuera del teléfono. */
+export const soporteGuion = { sub: 'Sugiere una solución y, si hace falta, crea un ticket.' };
+
+/** Momento 12. */
+export const proximamente = {
+  rotulo: 'Próximamente',
+  detalle: 'Pago en línea',
+};
+
+/** Momento 13. */
+export const cierreFinal = {
+  plan: 'Hablemos de un plan según el tamaño de tu negocio.',
+  boton: 'Agenda tu demo por WhatsApp',
+  contacto: marca.contacto,
 };
