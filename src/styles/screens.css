@@ -3,7 +3,7 @@
   width: 390px;
   height: 844px;
   border-radius: 47px;
-  overflow: hidden;
+  overflow: clip;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   background: var(--qx-fondo);

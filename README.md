@@ -3,7 +3,7 @@
 Presentación controlada por el presentador, en una sola escena 3D continua (three.js + GSAP),
 con las pantallas de los teléfonos hechas en HTML/CSS real.
 
-> Estado: **Etapa 1** (escenario, tokens, escena base, sistema de momentos y modo presentador).
+> Estado: **Etapa 2** (pantallas interactivas del negocio y del cliente en DOM real).
 > El README completo llega en la Etapa 4.
 
 ## Correr
@@ -30,9 +30,15 @@ npm run build:single   # dist-single/index.html: un solo archivo, abre con doble
 
 Los clics dentro de las pantallas de los teléfonos son interacción y no avanzan la presentación.
 
+## Revisar las pantallas sin 3D
+
+Abre el archivo con `#pantallas` al final de la dirección (por ejemplo `index.html#pantallas`):
+se ven la app del negocio, el WhatsApp del cliente y la app Quovix en plano, a tamaño real y tocables.
+
 ## Dónde editar
 
 - Textos, notas del orador y datos de ejemplo: `src/content.es.ts`
 - Colores, fuentes y tiempos: `src/tokens.ts`
 - Momentos (timelines): `src/moments/index.ts`
+- Pantallas: `src/screens/` (negocio, cliente, whatsapp) y estilos en `src/styles/app.css`
 - Lo que falta: `PENDIENTES.md`

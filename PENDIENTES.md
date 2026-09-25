@@ -18,7 +18,13 @@ Todo lo que falta confirmar o entregar. En pantalla, cada uno se ve como `[PENDI
   - Si existen los archivos maestros (SVG de la Q y del wordmark), reemplazarlos con el mismo nombre.
 - [ ] Colores: los tokens son aproximados (`src/tokens.ts`). Confirmar valores exactos con el manual de marca.
 
+## Pantallas (etapa 2)
+- [ ] **Fotos de categorías y negocios** (`assets/fotos/`): salen del PDF de pantallas que enviaste. Confirmar que se tienen los derechos de uso; si no, reemplazarlas con fotos propias del mismo nombre.
+- [ ] Los **logos de negocios del PDF** ("Barber Logo Maker", "Nails Studio") son de plantilla: no se usaron. Se muestran iniciales.
+- [ ] **Número del cliente** en la app: se usa uno ficticio (`+1 809-555-0147`). El del PDF parecía un número real y no se usó.
+- [ ] Negocios de ejemplo en la app del cliente (Studio Aura, Nails Bar, Casa Spa Zen) con zonas inventadas (Naco, Bella Vista, Gazcue).
+- [ ] Se quitaron de las pantallas, por las reglas de la demo: "Paga en línea", "Métodos de pago / tarjetas guardadas", "2x puntos pagando en línea", "Comisión de la plataforma", "En línea" como método de cobro y "Cobros y banco".
+
 ## Técnicos (se resuelven en las etapas siguientes)
-- [ ] Etapa 2: pantallas reales del negocio y del cliente en DOM (hoy hay una pantalla de bloqueo de prueba).
 - [ ] Etapa 3: contenido y consecuencia de los momentos 2 a 13 (hoy tienen solo cámara, teléfonos y frases).
 - [ ] Etapa 4: versión 2D de respaldo sin WebGL (hoy solo avisa), pulido y README completo.

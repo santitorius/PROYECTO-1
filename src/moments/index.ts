@@ -6,6 +6,16 @@ import type { Phone } from '../core/phone';
 import { PHONE } from '../core/phone';
 import { QMark, LightFrame } from '../core/qmark';
 import { hudState } from '../ui/hud';
+import type { NegocioApp } from '../screens/negocio';
+import type { ClienteApp } from '../screens/cliente';
+import type { WhatsAppScreen } from '../screens/whatsapp';
+
+export interface Apps {
+  negocio: NegocioApp;
+  cliente: ClienteApp;
+  wa: WhatsAppScreen;
+  pantallaCliente: { show(name: string): void; readonly current: string };
+}
 
 export interface Ctx {
   s: Scene3D;
@@ -13,6 +23,7 @@ export interface Ctx {
   frame: LightFrame;
   negocio: Phone;
   cliente: Phone;
+  apps: Apps;
   captions: HTMLElement;
   bg: { glow: number };
 }

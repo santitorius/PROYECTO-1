@@ -1,6 +1,7 @@
 import './styles/fonts.css';
 import './styles/base.css';
 import './styles/screens.css';
+import './styles/app.css';
 import { gsap } from 'gsap';
 import { applyTokens } from './tokens';
 import { ui } from './content.es';
@@ -13,7 +14,11 @@ import { buildTimelines, initialState, type Ctx } from './moments';
 import { Hud, hudState } from './ui/hud';
 import { Presenter } from './ui/presenter';
 import { GotoOverlay, Overview, toast } from './ui/overlays';
-import { lockScreen, clientSplash } from './screens/placeholder';
+import { createNegocioApp } from './screens/negocio';
+import { createClienteApp } from './screens/cliente';
+import { createWhatsApp } from './screens/whatsapp';
+import { createStack } from './screens/stack';
+import { startPreview } from './preview';
 
 applyTokens();
 
@@ -22,7 +27,9 @@ const stageEl = $('stage');
 const stage = new Stage(stageEl);
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-if (!webglAvailable()) {
+if (location.hash === '#pantallas') {
+  startPreview(stageEl);
+} else if (!webglAvailable()) {
   // [Etapa 4] versión 2D completa con los mismos momentos.
   toast(stageEl, ui.sinWebGL);
 } else {
@@ -37,12 +44,26 @@ function start(): void {
   const frame = new LightFrame();
   s.scene.add(q, frame);
 
-  const negocio = new Phone('negocio', lockScreen(), s);
-  const cliente = new Phone('cliente', clientSplash(), s);
+  // Pantallas reales (DOM): la app del negocio y, en el teléfono del cliente, WhatsApp y la app Quovix.
+  const appNegocio = createNegocioApp();
+  const appCliente = createClienteApp();
+  const wa = createWhatsApp();
+  const pantallaCliente = createStack({ whatsapp: wa.el, quovix: appCliente.el }, 'quovix');
+  const negocio = new Phone('negocio', appNegocio.el, s);
+  const cliente = new Phone('cliente', pantallaCliente.el, s);
   s.scene.add(negocio, cliente);
 
   const bgEl = $('bg');
-  const ctx: Ctx = { s, q, frame, negocio, cliente, captions: $('captions'), bg: { glow: 0 } };
+  const ctx: Ctx = {
+    s,
+    q,
+    frame,
+    negocio,
+    cliente,
+    apps: { negocio: appNegocio, cliente: appCliente, wa, pantallaCliente },
+    captions: $('captions'),
+    bg: { glow: 0 },
+  };
   initialState(ctx);
 
   const hud = new Hud($('hud'), 13);
@@ -129,10 +150,18 @@ function start(): void {
     handleKey(e);
   });
 
+  // Tocar un botón de la pantalla no debe robar el foco (así espacio/Enter siguen avanzando).
+  stageEl.addEventListener('mousedown', (e) => {
+    if ((e.target as HTMLElement).closest('.screen')) e.preventDefault();
+  });
+
   // Clic en el escenario = siguiente. Los clics dentro de las pantallas son interacción, no avanzan.
   stageEl.addEventListener('click', (e) => {
-    const t = e.target as HTMLElement;
-    if (t.closest('.screen, .interactive, .overlay')) return;
+    // composedPath() se fija al empezar el evento: sirve aunque la pantalla ya haya redibujado el botón.
+    const dentro = e
+      .composedPath()
+      .some((n) => n instanceof HTMLElement && n.matches('.screen, .interactive, .overlay'));
+    if (dentro) return;
     moments.next();
   });
 

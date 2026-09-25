@@ -282,3 +282,45 @@ body {
     radial-gradient(70% 70% at 18% 8%, rgba(15, 34, 51, 0.9), transparent 70%),
     radial-gradient(90% 90% at 50% 50%, rgba(15, 34, 51, 0.35), transparent 80%);
 }
+
+/* ---------- Revisión de pantallas (#pantallas) ---------- */
+#stage.preview {
+  background:
+    radial-gradient(60% 55% at 78% 92%, rgba(93, 203, 225, 0.16), transparent 70%),
+    radial-gradient(70% 70% at 18% 8%, rgba(15, 34, 51, 0.9), transparent 70%),
+    var(--qx-fondo);
+}
+.preview-row {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 90px;
+}
+.preview-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.preview-col .screen {
+  box-shadow: 0 0 0 10px #0c1119, 0 0 0 11px #2a3440, 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+.preview-title {
+  font-size: 16px;
+  color: var(--qx-turquesa);
+}
+.preview-tools {
+  display: flex;
+  gap: 8px;
+}
+.preview-btn {
+  font: 700 14px var(--qx-font-texto);
+  color: #fff;
+  background: transparent;
+  border: 1px solid var(--qx-turquesa);
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
