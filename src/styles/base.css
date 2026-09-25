@@ -1,0 +1,284 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #000; /* barras negras fuera del escenario */
+  overflow: hidden;
+  color: var(--qx-texto);
+  font-family: var(--qx-font-texto);
+  font-weight: var(--qx-peso-texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Escenario fijo 16:9 ---------- */
+#viewport {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--qx-stage-w);
+  height: var(--qx-stage-h);
+  transform-origin: 0 0;
+  background: var(--qx-fondo);
+  overflow: hidden;
+  cursor: default;
+  user-select: none;
+}
+#bg,
+#webgl,
+#css3d,
+#captions,
+#hud {
+  position: absolute;
+  inset: 0;
+}
+#webgl canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+#css3d {
+  pointer-events: none;
+}
+#css3d .screen {
+  pointer-events: auto;
+}
+#captions,
+#hud {
+  pointer-events: none;
+}
+#hud .interactive {
+  pointer-events: auto;
+}
+
+/* ---------- Tipografía de marca ---------- */
+.qx-titulo {
+  font-family: var(--qx-font-titulo);
+  font-weight: var(--qx-peso-titulo);
+  text-transform: uppercase;
+  letter-spacing: var(--qx-espaciado-titulo);
+}
+.qx-subtitulo {
+  font-family: var(--qx-font-subtitulo);
+  font-weight: var(--qx-peso-subtitulo);
+}
+.qx-turquesa {
+  color: var(--qx-turquesa);
+}
+
+/* ---------- Frases en escena ---------- */
+.caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 58px;
+  line-height: 1.15;
+  padding: 0 160px;
+  opacity: 0;
+  will-change: transform, opacity, filter;
+}
+.caption.bottom {
+  bottom: 120px;
+}
+.caption.top {
+  top: 96px;
+}
+.caption.left {
+  left: 120px;
+  right: auto;
+  width: 760px;
+  text-align: left;
+  padding: 0;
+  top: 50%; /* el centrado vertical lo hace GSAP con yPercent */
+}
+.caption.small {
+  font-size: 34px;
+  letter-spacing: 0.2em;
+}
+
+/* ---------- HUD ---------- */
+.progress {
+  position: absolute;
+  left: 50%;
+  bottom: 34px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  transition: opacity 0.8s;
+}
+.progress i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(93, 203, 225, 0.22);
+  transition: background 0.4s, transform 0.4s;
+}
+.progress i.done {
+  background: rgba(93, 203, 225, 0.6);
+}
+.progress i.on {
+  background: var(--qx-turquesa);
+  transform: scale(1.5);
+  box-shadow: 0 0 12px var(--qx-turquesa);
+}
+.counter {
+  position: absolute;
+  right: 48px;
+  bottom: 26px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--qx-texto-suave);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  opacity: 0;
+}
+.counter b {
+  font-family: var(--qx-font-subtitulo);
+  font-weight: 900;
+  font-size: 30px;
+  color: var(--qx-turquesa);
+  font-variant-numeric: tabular-nums;
+}
+.counter svg {
+  width: 20px;
+  height: 20px;
+  align-self: center;
+}
+.sample-badge {
+  position: absolute;
+  left: 48px;
+  bottom: 30px;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--qx-texto-tenue);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 6px 12px;
+  border-radius: 999px;
+  opacity: 0;
+}
+.auto-badge {
+  position: absolute;
+  right: 48px;
+  top: 34px;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--qx-turquesa);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.auto-badge.on {
+  opacity: 0.8;
+}
+
+/* ---------- Superposiciones: ir a / vista general ---------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 4, 10, 0.86);
+  backdrop-filter: blur(10px);
+  display: none;
+  pointer-events: auto;
+  z-index: 10;
+}
+.overlay.open {
+  display: grid;
+  place-items: center;
+}
+.goto-box {
+  text-align: center;
+}
+.goto-box h2 {
+  margin: 0 0 24px;
+  font-size: 30px;
+}
+.goto-box input {
+  width: 220px;
+  font: 900 96px var(--qx-font-subtitulo);
+  text-align: center;
+  color: var(--qx-turquesa);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--qx-turquesa);
+  outline: none;
+}
+.goto-box p {
+  color: var(--qx-texto-tenue);
+  font-size: 18px;
+}
+.overview {
+  width: 1560px;
+}
+.overview h2 {
+  margin: 0 0 8px;
+  font-size: 30px;
+}
+.overview p {
+  margin: 0 0 36px;
+  color: var(--qx-texto-tenue);
+  font-size: 18px;
+}
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+.overview-grid button {
+  all: unset;
+  cursor: pointer;
+  height: 150px;
+  padding: 20px 22px;
+  border-radius: 20px;
+  border: 1px solid rgba(93, 203, 225, 0.2);
+  background: linear-gradient(160deg, rgba(15, 34, 51, 0.9), rgba(3, 4, 10, 0.9));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.overview-grid button:hover,
+.overview-grid button:focus-visible {
+  border-color: var(--qx-turquesa);
+  transform: translateY(-3px);
+}
+.overview-grid button.on {
+  border-color: var(--qx-turquesa);
+  box-shadow: 0 0 0 1px var(--qx-turquesa), 0 0 30px rgba(93, 203, 225, 0.25);
+}
+.overview-grid b {
+  font: 900 44px var(--qx-font-subtitulo);
+  color: var(--qx-turquesa);
+}
+.overview-grid span {
+  font-size: 21px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress i {
+    transition: none;
+  }
+}
+
+/* Fondo: negro puro en la apertura; luego el resplandor azul noche / turquesa de la marca. */
+#bg {
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(60% 55% at 78% 92%, rgba(93, 203, 225, 0.16), transparent 70%),
+    radial-gradient(70% 70% at 18% 8%, rgba(15, 34, 51, 0.9), transparent 70%),
+    radial-gradient(90% 90% at 50% 50%, rgba(15, 34, 51, 0.35), transparent 80%);
+}

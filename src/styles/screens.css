@@ -1,0 +1,114 @@
+/* Pantallas de los teléfonos: DOM real dentro de la escena 3D (390x844 px). */
+.screen {
+  width: 390px;
+  height: 844px;
+  border-radius: 47px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--qx-fondo);
+  color: var(--qx-blanco);
+  font-family: var(--qx-font-texto);
+  position: relative;
+  cursor: default;
+}
+.screen button {
+  font-family: inherit;
+  cursor: pointer;
+}
+.scr {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+.scr-bg {
+  background:
+    radial-gradient(120% 70% at 85% 105%, rgba(93, 203, 225, 0.28), transparent 60%),
+    radial-gradient(90% 60% at 10% 0%, rgba(15, 34, 51, 0.95), transparent 70%),
+    linear-gradient(180deg, #0d1a26 0%, #070b12 100%);
+}
+.island {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 112px;
+  height: 32px;
+  border-radius: 20px;
+  background: #000;
+  z-index: 5;
+}
+
+/* Bloqueo (etapa 1) */
+.lock {
+  align-items: center;
+  padding-top: 92px;
+  text-align: center;
+}
+.lock .date {
+  font-size: 17px;
+  color: var(--qx-texto-suave);
+}
+.lock .time {
+  font-family: var(--qx-font-subtitulo);
+  font-weight: 900;
+  font-size: 86px;
+  line-height: 1;
+  margin-top: 4px;
+}
+.lock .wordmark {
+  width: 190px;
+  margin-top: 150px;
+}
+.lock .tag {
+  margin-top: 10px;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--qx-cian-negocios);
+  text-transform: uppercase;
+}
+.lock .test {
+  margin-top: auto;
+  margin-bottom: 70px;
+  border: 1px solid rgba(93, 203, 225, 0.5);
+  background: rgba(15, 34, 51, 0.6);
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-size: 15px;
+  transition: background 0.25s, transform 0.15s;
+}
+.lock .test:active {
+  transform: scale(0.97);
+}
+.lock .test.ok {
+  background: var(--qx-turquesa);
+  color: var(--qx-fondo);
+  font-weight: 900;
+}
+
+/* Cliente (etapa 1) */
+.splash {
+  justify-content: flex-end;
+  padding: 0 32px 90px;
+}
+.splash .q {
+  position: absolute;
+  top: 70px;
+  left: 30px;
+  width: 58px;
+}
+.splash h1 {
+  margin: 0;
+  font-family: var(--qx-font-titulo);
+  font-weight: var(--qx-peso-titulo);
+  font-size: 38px;
+  line-height: 1.02;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.splash h1 em {
+  font-style: normal;
+  color: var(--qx-turquesa);
+}
